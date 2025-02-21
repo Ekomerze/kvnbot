@@ -198,8 +198,8 @@ app = Application.builder().token(TOKEN).build()
 async def set_webhook():
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
-if __name__ == "__main__":
-    import threading
+if __name__ != "__main__":
+    app = app  # Gunicorn vajag `app` kā globālu objektu
 
     # Запускаем webhook асинхронно
     threading.Thread(target=asyncio.run, args=(set_webhook(),)).start()
