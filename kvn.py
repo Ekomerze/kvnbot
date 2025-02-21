@@ -9,14 +9,12 @@ from flask import Flask
 import os
 from dotenv import load_dotenv
 
-app = Flask(__name__)
+# **1️⃣ Flask aplikācija (`flask_app`), NEVIS `app`**
+flask_app = Flask(__name__)
 
-# Загружаем .env файл
+# **2️⃣ Ielādē Telegram tokenu**
 load_dotenv()
-
-# Получаем Telegram токен
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-
 if not TOKEN:
     raise ValueError("TELEGRAM_TOKEN не установлен! Проверьте .env файл.")
 
@@ -41,14 +39,15 @@ print(f"Общее количество вопросов: {len(QUESTIONS)}")
 print("Бот запущен...")
 
 
-@app.route('/')
+@flask_app.route('/')
 def index():
     return "KVN Бот работает!"
 
-@app.route('/telegram', methods=['POST'])
+@flask_app.route('/telegram', methods=['POST'])
 def telegram_webhook():
-    update = Update.de_json(request.get_json(force=True), app.bot)
-    asyncio.run(app.process_update(update))
+    """Apstrādā Telegram webhook pieprasījumus"""
+    update = Update.de_json(request.get_json(force=True), bot_app.bot)
+    asyncio.run(bot_app.process_update(update))
     return "OK", 200
 
 json_file_path = "kvn_quiz_questions_full.json"
@@ -76,6 +75,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_question(update, context)
 
 print("Вопросы загружены:", len(QUESTIONS))
+
+# **8️⃣ Pievieno Telegram handlerus**
+bot_app.add_handler(CommandHandler("start", start))
+bot_app.add_handler(CallbackQueryHandler(start))
 
 # **2. Отправка вопроса с вариантами ответов**
 async def send_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -199,12 +202,9 @@ app = Application.builder().token(TOKEN).build()
 async def set_webhook():
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
-if __name__ != "__main__":
-    app = app  # Gunicorn vajag `app` kā globālu objektu
-
-    # Запускаем webhook асинхронно
-    threading.Thread(target=asyncio.run, args=(set_webhook(),)).start()
-
+if __name__ == "__main__":
+    threading.Thread(target=lambda: asyncio.run(set_webhook())).start()
+    
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    flask_app.run(host="0.0.0.0", port=port)
 
