@@ -44,10 +44,10 @@ def index():
     return "KVN Бот работает!"
 
 @flask_app.route('/telegram', methods=['POST'])
-def telegram_webhook():
-    """Apstrādā Telegram webhook pieprasījumus"""
+async def telegram_webhook():
     update = Update.de_json(request.get_json(force=True), bot_app.bot)
-    asyncio.run(bot_app.process_update(update))
+    await bot_app.initialize()  # ✅ Pareizi inicializējam bota aplikāciju
+    await bot_app.process_update(update)
     return "OK", 200
 
 json_file_path = "kvn_quiz_questions_full.json"
