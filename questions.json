@@ -1,0 +1,12 @@
+[
+    {
+        "question": "Kurā gadā notika pirmais KVN raidījums?",
+        "options": ["1959", "1961", "1965", "1970"],
+        "answer": "1961"
+    },
+    {
+        "question": "Kurš ir populārākais KVN vadītājs?",
+        "options": ["Masļakovs", "Petrosjans", "Zadornovs", "Hazanovs"],
+        "answer": "Masļakovs"
+    }
+]
