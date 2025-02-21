@@ -5,7 +5,7 @@ import sqlite3
 import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-from flask import Flask
+from flask import Flask, request
 import os
 from dotenv import load_dotenv
 
