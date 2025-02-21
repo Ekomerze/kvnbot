@@ -167,6 +167,9 @@ print("Бот запущен...")
 # **Запускаем бота**
 app.run_polling()
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Noklusējuma ports ir 5000
-    app.run(host="0.0.0.0", port=port)
+print(f"Общее количество вопросов: {len(QUESTIONS)}")
+print("Бот запущен...")
+
+# **Запускаем бота**
+app.run_polling()
+
