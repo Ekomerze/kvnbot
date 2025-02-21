@@ -165,11 +165,18 @@ print(f"Общее количество вопросов: {len(QUESTIONS)}")
 print("Бот запущен...")
 
 # **Запускаем бота**
-app.run_polling()
 
-print(f"Общее количество вопросов: {len(QUESTIONS)}")
-print("Бот запущен...")
+WEBHOOK_URL = "https://kvnbot.onrender.com"  # Tavs Render URL
 
-# **Запускаем бота**
-app.run_polling()
+app = Application.builder().token(TOKEN).build()
+
+async def set_webhook():
+    await app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
+
+app.run_webhook(
+    listen="0.0.0.0",
+    port=int(os.environ.get("PORT", 5000)),
+    webhook_url=f"{WEBHOOK_URL}/telegram"
+)
+
 
