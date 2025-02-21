@@ -1,3 +1,2 @@
 #!/bin/bash
-python kvn.py
-gunicorn -b 0.0.0.0:5000 kvn:app
+gunicorn -w 4 -b 0.0.0.0:5000 kvn:app
