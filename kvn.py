@@ -19,9 +19,36 @@ TOKEN = os.getenv("TELEGRAM_TOKEN")
 if not TOKEN:
     raise ValueError("TELEGRAM_TOKEN не установлен! Проверьте .env файл.")
 
+# Telegram bot
+bot_app = Application.builder().token(TOKEN).build()
+
+# Настраиваем webhook
+WEBHOOK_URL = "https://kvnbot.onrender.com"
+
+# Подключаемся к базе данных
+conn = sqlite3.connect("kvn_quiz.db", check_same_thread=False)
+cursor = conn.cursor()
+cursor.execute("CREATE TABLE IF NOT EXISTS scores (user_id INTEGER, score INTEGER)")
+conn.commit()
+
+# Загружаем вопросы
+json_file_path = "kvn_quiz_questions_full.json"
+with open(json_file_path, "r", encoding="utf-8") as file:
+    QUESTIONS = json.load(file)
+
+print(f"Общее количество вопросов: {len(QUESTIONS)}")
+print("Бот запущен...")
+
+
 @app.route('/')
 def index():
     return "KVN Бот работает!"
+
+@app.route('/telegram', methods=['POST'])
+def telegram_webhook():
+    update = Update.de_json(request.get_json(force=True), app.bot)
+    asyncio.run(app.process_update(update))
+    return "OK", 200
 
 json_file_path = "kvn_quiz_questions_full.json"
 print(f"Ищу JSON файл: {os.path.abspath(json_file_path)}")
@@ -166,17 +193,17 @@ print("Бот запущен...")
 
 # **Запускаем бота**
 
-WEBHOOK_URL = "https://kvnbot.onrender.com"  # Tavs Render URL
-
 app = Application.builder().token(TOKEN).build()
 
 async def set_webhook():
-    await app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
+    await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
-app.run_webhook(
-    listen="0.0.0.0",
-    port=int(os.environ.get("PORT", 5000)),
-    webhook_url=f"{WEBHOOK_URL}/telegram"
-)
+if __name__ == "__main__":
+    import threading
 
+    # Запускаем webhook асинхронно
+    threading.Thread(target=asyncio.run, args=(set_webhook(),)).start()
+
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
