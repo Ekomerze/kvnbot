@@ -215,19 +215,14 @@ print("Бот запущен...")
 
 app = Application.builder().token(TOKEN).build()
 
-async def set_webhook():
+async def setup():
+    await bot_app.initialize()
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
 if __name__ == "__main__":
-    async def setup():
-        await bot_app.initialize()
-        await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
-
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(setup())  # ✅ Pareizi inicializē botu pirms Flask starta
 
-    port = int(os.environ.get("PORT", 10000))  # Portu pielāgo Render automātiski
+    port = int(os.environ.get("PORT", 10000))  # ✅ Portu pielāgo Render automātiski
     flask_app.run(host="0.0.0.0", port=port)
-
-
