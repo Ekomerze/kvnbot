@@ -22,8 +22,9 @@ if not TOKEN:
 bot_app = Application.builder().token(TOKEN).build()
 
 async def handle_update(update):
-    """Inicializē aplikāciju un apstrādā atjauninājumu (webhook ziņu)"""
-    await bot_app.initialize()  # Nepieciešams webhook režīmā
+    """Inicializē aplikāciju un apstrādā ienākošo atjauninājumu (Webhook ziņu)"""
+    if not bot_app._initialized:
+        await bot_app.initialize()  # ✅ Nepieciešams webhook režīmā
     await bot_app.process_update(update)
 
 # Подключаемся к базе данных
@@ -55,9 +56,10 @@ def telegram_webhook():
 WEBHOOK_URL = "https://kvnbot.onrender.com"
 
 async def set_webhook():
-    await bot_app.initialize()  # Nepieciešams webhook režīmā
+    if not bot_app._initialized:
+        await bot_app.initialize()
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
-
+    
 json_file_path = "kvn_quiz_questions_full.json"
 print(f"Ищу JSON файл: {os.path.abspath(json_file_path)}")
 print(f"Файл существует? {os.path.exists(json_file_path)}")
