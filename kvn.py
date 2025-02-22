@@ -225,7 +225,10 @@ if __name__ == "__main__":
         await bot_app.initialize()
         await set_webhook()
 
-    asyncio.run(setup())  # ✅ Pareizi inicializē botu pirms Flask starta
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(setup())  # ✅ Pareizi inicializē botu pirms Flask starta
 
     port = int(os.environ.get("PORT", 10000))
     flask_app.run(host="0.0.0.0", port=port)
+
