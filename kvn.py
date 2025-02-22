@@ -59,7 +59,7 @@ async def set_webhook():
     if not bot_app._initialized:
         await bot_app.initialize()
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
-    
+
 json_file_path = "kvn_quiz_questions_full.json"
 print(f"Ищу JSON файл: {os.path.abspath(json_file_path)}")
 print(f"Файл существует? {os.path.exists(json_file_path)}")
@@ -215,6 +215,5 @@ async def set_webhook():
 if __name__ == "__main__":
     threading.Thread(target=lambda: asyncio.run(set_webhook())).start()
     
-    port = int(os.environ.get("PORT", 5000))
-    flask_app.run(host="0.0.0.0", port=port)
+    flask_app.run(host="0.0.0.0", port=5000)  # 🔥 Piespied 5000. portu
 
