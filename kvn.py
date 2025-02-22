@@ -219,16 +219,15 @@ async def set_webhook():
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
 if __name__ == "__main__":
-    import asyncio
-
     async def setup():
         await bot_app.initialize()
-        await set_webhook()
+        await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(setup())  # ✅ Pareizi inicializē botu pirms Flask starta
 
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 10000))  # Portu pielāgo Render automātiski
     flask_app.run(host="0.0.0.0", port=port)
+
 
