@@ -213,7 +213,8 @@ async def set_webhook():
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
 if __name__ == "__main__":
-    threading.Thread(target=lambda: asyncio.run(set_webhook())).start()
-    
-    flask_app.run(host="0.0.0.0", port=5000)  # 🔥 Piespied 5000. portu
+    import asyncio
+    asyncio.run(set_webhook())  # ✅ Sinhroni inicializē webhook
 
+    port = int(os.environ.get("PORT", 10000))  # ✅ Izmanto Render norādīto portu
+    flask_app.run(host="0.0.0.0", port=port)
