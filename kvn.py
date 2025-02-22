@@ -48,9 +48,15 @@ def index():
 
 @flask_app.route('/telegram', methods=['POST'])
 def telegram_webhook():
-    update = Update.de_json(request.get_json(force=True), bot_app)
-    asyncio.run(bot_app.process_update(update))  # Sinhroni izsaucam asyncio
+    update = Update.de_json(request.get_json(force=True), bot_app.bot)
+
+    # ✅ Pirms `process_update()`, nodrošinām, ka aplikācija ir inicializēta
+    if not bot_app._initialized:
+        await bot_app.initialize()
+
+    await bot_app.process_update(update)
     return "OK", 200
+
 
 # Настраиваем webhook
 WEBHOOK_URL = "https://kvnbot.onrender.com"
@@ -214,7 +220,12 @@ async def set_webhook():
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(set_webhook())  # ✅ Sinhroni inicializē webhook
 
-    port = int(os.environ.get("PORT", 10000))  # ✅ Izmanto Render norādīto portu
+    async def setup():
+        await bot_app.initialize()
+        await set_webhook()
+
+    asyncio.run(setup())  # ✅ Pareizi inicializē botu pirms Flask starta
+
+    port = int(os.environ.get("PORT", 10000))
     flask_app.run(host="0.0.0.0", port=port)
