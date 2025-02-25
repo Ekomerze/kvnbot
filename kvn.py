@@ -41,30 +41,25 @@ with open(json_file_path, "r", encoding="utf-8") as file:
 print(f"Общее количество вопросов: {len(QUESTIONS)}")
 print("Бот запущен...")
 
-
-@flask_app.route('/')
-def index():
-    return "KVN Бот работает!"
-
 @flask_app.route('/telegram', methods=['POST'])
 def telegram_webhook():
     update = Update.de_json(request.get_json(force=True), bot_app.bot)
 
     # ✅ Pirms `process_update()`, nodrošinām, ka aplikācija ir inicializēta
-    if not bot_app._initialized:
-        await bot_app.initialize()
+    asyncio.run(bot_app.process_update(update))
 
-    await bot_app.process_update(update)
     return "OK", 200
 
+@flask_app.route('/')
+def index():
+    return "KVN Бот работает!"
 
 # Настраиваем webhook
 WEBHOOK_URL = "https://kvnbot.onrender.com"
 
 async def set_webhook():
-    if not bot_app._initialized:
-        await bot_app.initialize()
-    await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
+    await bot_app.initialize()
+    await bot_app.bot.set_webhook(f"https://kvnbot.onrender.com/telegram")
 
 json_file_path = "kvn_quiz_questions_full.json"
 print(f"Ищу JSON файл: {os.path.abspath(json_file_path)}")
@@ -219,10 +214,15 @@ async def setup():
     await bot_app.initialize()
     await bot_app.bot.set_webhook(f"{WEBHOOK_URL}/telegram")
 
-if __name__ == "__main__":
+# **7️⃣ Starta funkcija**
+def start_app():
+    """Izsauc `set_webhook()` pirms Flask palaišanas"""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(setup())  # ✅ Pareizi inicializē botu pirms Flask starta
+    loop.run_until_complete(set_webhook())
 
-    port = int(os.environ.get("PORT", 10000))  # ✅ Portu pielāgo Render automātiski
+    port = int(os.environ.get("PORT", 10000))  # ✅ Render automātiski piešķir portu
     flask_app.run(host="0.0.0.0", port=port)
+
+if __name__ == "__main__":
+    start_app()
