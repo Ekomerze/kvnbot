@@ -28,12 +28,11 @@ async def set_webhook():
 
 # **5️⃣ Flask webhook route**
 @flask_app.route('/telegram', methods=['POST'])
-def telegram_webhook():
-    """Flask endpoint priekš Telegram webhook"""
+async def telegram_webhook():
+    """Flask async endpoint priekš Telegram webhook"""
     update = Update.de_json(request.get_json(force=True), bot_app.bot)
-
-    # ✅ Flask neatbalsta `await`, tāpēc jāizmanto `ensure_sync()`
-    return flask_app.ensure_sync(bot_app.process_update)(update), 200
+    await bot_app.process_update(update)
+    return "OK", 200
 
 # **6️⃣ Flask test route**
 @flask_app.route('/')
